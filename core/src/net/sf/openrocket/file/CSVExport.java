@@ -119,8 +119,8 @@ public class CSVExport {
 
 
 		// Loop over all data points
-		for (int pos = 0; pos < n; pos++) {
-
+		/*for (int pos = 0; pos < n; pos++) {*/
+		for (int pos=(n-1); pos < n; pos++) { 		//start loop @ pos=n-1 to print last line (position n) only
 			// Check for events to store
 			if (eventComments && time != null) {
 				double t = time.get(pos);
