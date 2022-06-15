@@ -75,7 +75,7 @@ public class CSVExport {
 			}
 
 			writeData(writer, branch, fields, units, fieldSeparator, decimalPlaces, isExponentialNotation,
-					eventComments, commentStarter);
+					eventComments, commentStarter, false);
 
 
 		} finally {
@@ -91,7 +91,7 @@ public class CSVExport {
 
 	private static void writeData(PrintWriter writer, FlightDataBranch branch,
 			FlightDataType[] fields, Unit[] units, String fieldSeparator, int decimalPlaces, boolean isExponentialNotation,
-			boolean eventComments, String commentStarter) {
+			boolean eventComments, String commentStarter, boolean isMonteCarlo) {	//added parameter for monte-carlo method being active
 
 		// Number of data points
 		int n = branch.getLength();
@@ -119,32 +119,57 @@ public class CSVExport {
 
 
 		// Loop over all data points
-		/*for (int pos = 0; pos < n; pos++) {*/
-		for (int pos=(n-1); pos < n; pos++) { 		//start loop @ pos=n-1 to print last line (position n) only
-			// Check for events to store
-			if (eventComments && time != null) {
-				double t = time.get(pos);
+		if (isMonteCarlo) {
+			for (int pos=(n-1); pos < n; pos++) { 		//start loop @ pos=n-1 to print last line (position n) only
+				// Check for events to store
+				if (eventComments && time != null) {
+					double t = time.get(pos);
 
-				while ((eventPosition < events.size()) &&
-						(events.get(eventPosition).getTime() <= t)) {
-					printEvent(writer, events.get(eventPosition), commentStarter);
-					eventPosition++;
+					while ((eventPosition < events.size()) &&
+							(events.get(eventPosition).getTime() <= t)) {
+						printEvent(writer, events.get(eventPosition), commentStarter);
+						eventPosition++;
+					}
 				}
-			}
 
-			// Store CSV line
-			for (int i = 0; i < fields.length; i++) {
-				double value = fieldValues.get(i).get(pos);
-				writer.print(TextUtil.doubleToString(units[i].toUnit(value), decimalPlaces, isExponentialNotation));
+				// Store CSV line
+				for (int i = 0; i < fields.length; i++) {
+					double value = fieldValues.get(i).get(pos);
+					writer.print(TextUtil.doubleToString(units[i].toUnit(value), decimalPlaces, isExponentialNotation));
 
-				if (i < fields.length - 1) {
-					writer.print(fieldSeparator);
+					if (i < fields.length - 1) {
+						writer.print(fieldSeparator);
+					}
 				}
+				writer.println();
 			}
-			writer.println();
-
 		}
+		else {
+			for (int pos = 0; pos < n; pos++) {
+				// Check for events to store
+				if (eventComments && time != null) {
+					double t = time.get(pos);
 
+					while ((eventPosition < events.size()) &&
+							(events.get(eventPosition).getTime() <= t)) {
+						printEvent(writer, events.get(eventPosition), commentStarter);
+						eventPosition++;
+					}
+				}
+
+				// Store CSV line
+				for (int i = 0; i < fields.length; i++) {
+					double value = fieldValues.get(i).get(pos);
+					writer.print(TextUtil.doubleToString(units[i].toUnit(value), decimalPlaces, isExponentialNotation));
+
+					if (i < fields.length - 1) {
+						writer.print(fieldSeparator);
+					}
+				}
+				writer.println();
+
+			}
+		}
 		// Store any remaining events
 		if (eventComments && time != null) {
 			while (eventPosition < events.size()) {
@@ -154,7 +179,6 @@ public class CSVExport {
 		}
 
 	}
-
 
 	private static void printEvent(PrintWriter writer, FlightEvent e,
 			String commentStarter) {
