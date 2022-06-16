@@ -51,6 +51,7 @@ public abstract class Preferences implements ChangeSource {
 	public static final String EXPORT_SIMULATION_COMMENT = "ExportSimulationComment";
 	public static final String EXPORT_FIELD_NAME_COMMENT = "ExportFieldDescriptionComment";
 	public static final String EXPORT_EVENT_COMMENTS = "ExportEventComments";
+	public static final String EXPORT_MONTE_CARLO = "ExportMonteCarlo";
 	public static final String EXPORT_COMMENT_CHARACTER = "ExportCommentCharacter";
 	public static final String USER_LOCAL = "locale";
 	
